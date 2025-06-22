@@ -38,15 +38,54 @@ const file = require('fs')
 // const files = file.readdirSync('./')  // avoid using sync methods because they are blocking, you want to use non-blocking methods/ async methods to serve many clients
 // console.log(files)
 
-fstat.readdir('$',function(err, files){
+file.readdir('./', function(err, files){
     if(err){
-        console.log('Error', error) // not how we handle errors normally
+        console.log("Error", error)
     } else {
-        console.log('Result', files)
+        console.log("Rsult", files)
     }
-})
-
+});
 
 
 // events module
-const events = require('events')
+
+// Event Emitter is one of the core building blocks of node
+const EventEmitter = require('events')  // EventEmitter is a class you can tell by the casing
+
+const Logger = require('./logger')
+const log = new Logger(); 
+
+// register a listener
+log.on('messageLogged', (arg) => { //instead of function(arg), you can (arg) => // can be called anything, e , event arg
+    console.log("listner called", arg)
+});
+
+//signalling an event has happened
+log.log('message')
+
+// order matters
+// we have to register listeners before emitting because callig the emit method makes the emitter iterate over all the registered listeners and calls them synchronously 
+
+
+
+
+// http module
+const http = require('http');
+
+const server = http.createServer((req, res) => { // this gets more dirty over time, which is where express comes in
+    if (req.url == '/'){
+        res.write("hello world")
+        res.end()
+    }
+
+    if(req.url == '/api/courses'){
+        res.write(JSON.stringify([1,2,3]))
+        res.end()
+    }
+
+
+}); // with this we can create a web server, this server is an EventEmitter, so it has all its capabilities
+
+server.listen(3000); // 3000 is a port
+
+console.log('Listening on port 3000...')
